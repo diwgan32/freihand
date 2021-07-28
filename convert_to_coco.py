@@ -21,7 +21,11 @@ def convert_training_samples(base_path):
     output = {
         "images": [],
         "annotations": [],
-        "categories": []
+        "categories": [{
+            'supercategory': 'person',
+            'id': 1,
+            'name': 'person'
+        }]
     }
     set_name = "training"
 
@@ -51,16 +55,15 @@ def convert_training_samples(base_path):
                 "princpt": [K[0][2], K[1][2]]
             }
         })
-
         output["annotations"].append({
             "id": idx,
             "image_id": idx,
             "category_id": 1,
             "is_crowd": 0,
-            "joint_img": uv,
+            "joint_img": uv.tolist(),
             "joint_valid": np.ones(21).tolist(),
             "hand_type": "right",
-            "joint_cam": xyz,
+            "joint_cam": xyz.tolist(),
             "bbox": get_bbox(uv)
         })
     with open('freihand_training.json', 'w') as f:
