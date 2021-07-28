@@ -1,4 +1,6 @@
 from __future__ import print_function, unicode_literals
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import argparse
 
@@ -14,7 +16,7 @@ def show_training_samples(base_path, version, num2show=None, render_mano=False):
 
     # load annotations
     db_data_anno = load_db_annotation(base_path, 'training')
-
+    plt.ioff()
     # iterate over all samples
     for idx in range(db_size('training')):
         if idx >= num2show:
@@ -52,7 +54,10 @@ def show_training_samples(base_path, version, num2show=None, render_mano=False):
         plot_hand(ax2, uv, order='uv')
         ax1.axis('off')
         ax2.axis('off')
-        plt.show()
+
+        plt.savefig('output/test_'+str(idx)+'.png', bbox_inches='tight', pad_inches=0)
+        plt.close()
+        #plt.show()
 
 
 def show_eval_samples(base_path, num2show=None):
