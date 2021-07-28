@@ -105,6 +105,16 @@ def plot_hand(axis, coords_hw, vis=None, color_fixed=None, linewidth='1', order=
         if vis[i] > 0.5:
             axis.plot(coords_hw[i, 1], coords_hw[i, 0], 'o', color=colors[i, :])
 
+def get_bbox(uv):
+    x = min(uv[:, 0]) - 10
+    y = min(uv[:, 1]) - 10
+
+    x_max = min(max(uv[:, 0]) + 10, 224)
+    y_max = min(max(uv[:, 1]) + 10, 224)
+
+    return [
+        max(0, x), max(0, y), x_max - x, y_max - y
+    ]
 
 """ Dataset related functions. """
 def db_size(set_name):
