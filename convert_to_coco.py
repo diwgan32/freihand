@@ -12,12 +12,11 @@ import argparse
 from utils.fh_utils import *
 
 
-def convert_training_samples(base_path):
+def convert_samples(base_path, set_type="training"):
     from utils.model import recover_root, get_focal_pp, split_theta
 
-
     # load annotations
-    db_data_anno = load_db_annotation(base_path, 'training')
+    db_data_anno = load_db_annotation(base_path, set_type)
     output = {
         "images": [],
         "annotations": [],
@@ -27,12 +26,11 @@ def convert_training_samples(base_path):
             'name': 'person'
         }]
     }
-    set_name = "training"
-
+    
     # Sticking with gs for now
     version = "gs"
     # iterate over all samples
-    for idx in range(db_size('training')):
+    for idx in range(db_size(set_type)):
         # annotation for this frame
         K, mano, xyz = db_data_anno[idx]
         K, mano, xyz = [np.array(x) for x in [K, mano, xyz]]
@@ -42,7 +40,7 @@ def convert_training_samples(base_path):
         focal, pp = get_focal_pp(K)
         xyz_root = recover_root(uv_root, scale, focal, pp)
         os.path.join(
-            base_path, set_name, 'rgb',
+            base_path, set_type, 'rgb',
             '%08d.jpg' % sample_version.map_id(idx, version)
         )
         output["images"].append({
@@ -66,27 +64,9 @@ def convert_training_samples(base_path):
             "joint_cam": xyz.tolist(),
             "bbox": get_bbox(uv)
         })
-    with open('freihand_training.json', 'w') as f:
+
+    with open('freihand_' + set_type + '.json', 'w') as f:
         json.dump(output, f)
-
-def show_eval_samples(base_path, num2show=None):
-    if num2show == -1:
-        num2show = db_size('evaluation') # show all
-
-    for idx in  range(db_size('evaluation')):
-        if idx >= num2show:
-            break
-
-        # load image only, because for the evaluation set there is no mask
-        img = read_img(idx, base_path, 'evaluation')
-
-        # show
-        fig = plt.figure()
-        ax1 = fig.add_subplot(111)
-        ax1.imshow(img)
-        ax1.axis('off')
-        plt.show()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Show some samples from the dataset.')
@@ -96,7 +76,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     #convert_eval_samples(args.base_path, num2show=args.num2show)
 
-    convert_training_samples(
-        args.base_path
+    convert_samples(
+        args.base_path,
+        "training"
     )
 
+    convert_samples(
+        args.base_path,
+        "evaluation"
+    )
