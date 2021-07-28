@@ -15,8 +15,6 @@ from utils.fh_utils import *
 def convert_training_samples(base_path):
     from utils.model import recover_root, get_focal_pp, split_theta
 
-    if num2show == -1:
-        num2show = db_size('training') # show all
 
     # load annotations
     db_data_anno = load_db_annotation(base_path, 'training')
