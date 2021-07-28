@@ -35,7 +35,8 @@ def convert_training_samples(base_path):
         K, mano, xyz = db_data_anno[idx]
         K, mano, xyz = [np.array(x) for x in [K, mano, xyz]]
         uv = projectPoints(xyz, K)
-
+        print(uv)
+        input("? ")
         poses, shapes, uv_root, scale = split_theta(mano)
         focal, pp = get_focal_pp(K)
         xyz_root = recover_root(uv_root, scale, focal, pp)
@@ -54,6 +55,13 @@ def convert_training_samples(base_path):
             }
         })
 
+        output["annotations"].append({
+            "id": idx,
+            "image_id": idx,
+            "category_id": 1,
+            "is_crowd": 0,
+            "joint_img": []
+        })
     with open('freihand_training.json', 'w') as f:
         json.dump(output, f)
 
