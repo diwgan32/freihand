@@ -1,4 +1,6 @@
 from __future__ import print_function, unicode_literals
+import matplotlib  
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import argparse
 
