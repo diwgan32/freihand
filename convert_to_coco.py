@@ -11,6 +11,14 @@ import argparse
 
 from utils.fh_utils import *
 
+def reproject_to_3d(im_coords, K, z):
+    im_coords = np.stack([im_coords[:,0], im_coords[:,1]],axis=1)
+    im_coords = np.hstack((im_coords, np.ones((im_coords.shape[0],1))))
+    projected = np.dot(np.linalg.inv(K), im_coords.T).T
+    projected[:, 0] *= z
+    projected[:, 1] *= z
+    projected[:, 2] *= z
+    return projected
 
 def convert_samples(base_path, set_type="training"):
     from utils.model import recover_root, get_focal_pp, split_theta
@@ -43,10 +51,15 @@ def convert_samples(base_path, set_type="training"):
             base_path, set_type, 'rgb',
             '%08d.jpg' % sample_version.map_id(idx, version)
         )
+
+        uv *= (float(256)/224)
+        xyz_camera = reproject_to_3d(uv, K, xyz_camera[:, 2])
+                
+
         output["images"].append({
             "id": idx,
-            "width": 224,
-            "height": 224,
+            "width": 256,
+            "height": 256,
             "file_name": '%08d.jpg' % sample_version.map_id(idx, version),
             "camera_param": {
                 "focal": [K[0][0], K[1][1]],
@@ -61,7 +74,7 @@ def convert_samples(base_path, set_type="training"):
             "joint_img": uv.tolist(),
             "joint_valid": np.ones(21).tolist(),
             "hand_type": "right",
-            "joint_cam": xyz.tolist(),
+            "joint_cam": (xyz * 1000).tolist(),
             "bbox": get_bbox(uv)
         })
 
