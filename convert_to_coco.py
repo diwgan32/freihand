@@ -53,7 +53,7 @@ def convert_samples(base_path, set_type="training"):
         )
 
         uv *= (float(256)/224)
-        xyz_camera = reproject_to_3d(uv, K, xyz_camera[:, 2])
+        xyz = reproject_to_3d(uv, K, xyz[:, 2])
                 
 
         output["images"].append({
